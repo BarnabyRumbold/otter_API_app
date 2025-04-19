@@ -1,0 +1,7 @@
+[theme]
+base = "light"
+primaryColor = "#B22222"  # Firebrick red (strong, professional, and understated)
+backgroundColor = "#F7F7F7"  # Light grey (clean, neutral, professional)
+secondaryBackgroundColor = "#DCDCDC"  # Gainsboro grey (soft, subtle contrast)
+textColor = "#333333"  # Dark grey (professional, easy to read)
+font = "serif"  # Serif for a formal, professional feel
