@@ -7,7 +7,7 @@ import requests
 import numpy as np
 
 # Set up pages, create titles
-pg = st.navigation([st.Page("home_page.py", title="Welcome"),
+pg = st.navigation([st.Page("home.py", title="Welcome"),
         st.Page("over_time.py", title="Sightings Over Time (Time Series)"),
         st.Page("map_visual.py", title="Sightings Over Time (Map Visual)"),
         st.Page("seasonal_changes.py", title="Seasonal Changes"),
