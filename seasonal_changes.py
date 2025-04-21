@@ -1,16 +1,22 @@
+# import packages
+
 import streamlit as st
 import pandas as pd
 import requests
 import altair as alt
 import matplotlib.pyplot as plt
 
+# set page layout and add Mammal Society logo to sidebar
 st.set_page_config(layout="wide")
 st.sidebar.markdown("""<div style="text-align: center;">
         <img src="https://images.squarespace-cdn.com/content/v1/654a3265fcbd755384b0552f/5cc2d0e2-dd55-449f-ae3a-949ab6871318/MSlogo_colour_strapblue_L-800px.jpeg?format=1500w" alt="Logo" width="100"/>
     </div>
 """, unsafe_allow_html=True)
 
+# add page title
 st.write("### Seasonal Changes")
+
+# get data from session state
 if st.session_state.otter_data is not None:
     df = st.session_state.otter_data
 
@@ -87,3 +93,6 @@ st.altair_chart(seasonal_chart, use_container_width=True)
 
 st.markdown("*This graph shows monthly changes in otter sightings over the last 10 years.*")
 st.altair_chart(monthly_chart, use_container_width=True)
+
+# Note to provide information about where the data is coming from
+st.markdown("*Showing live data from National Biodiversity Network Trust Atlas API.*")

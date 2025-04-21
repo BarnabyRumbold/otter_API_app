@@ -8,8 +8,10 @@ import altair as alt
 import numpy as np
 from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
+from datetime import datetime, timedelta
 
-# Set up page
+
+# Set up page and add Mammal Soceity to sidebar
 st.set_page_config(layout="wide")
 st.sidebar.markdown("""
     <div style="text-align: center;">
@@ -17,18 +19,19 @@ st.sidebar.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
+# Add title and page description
 st.write("### Insights & Recommendations")
 st.markdown("*This page provides an overview of statistics related to otter sightings.*")
-st.markdown("*Summary statistics are provided alongside geographical locations showing both an increase and decrease in otter sightings, potentially reflective of changes to otter populations. Finally some data quality observations are made for clarity as well as potential recommendations for future work. Important consideration must be given to the fact that this is recorded otter sightings and not necessarily a reflection of otter populations.*")
+st.markdown("*Summary statistics are provided alongside geographical locations showing top locations for otter sightings, potentially reflective of changes to otter populations. Finally some data quality observations are made for clarity as well as potential recommendations for future work. Important consideration must be given to the fact that this is recorded otter sightings and not necessarily a reflection of otter populations.*")
 
+# get session state data
 df = st.session_state.otter_data
+
 # Order returned data frame by date
 df_sorted = df.sort_values(by='eventDate', ascending=True)
 
 # Lots of blank rows! Let's remove those with no date
 df = df_sorted.dropna(subset=['eventDate'])
-
-
 
 # There are some wierd date inputs, lets force these to numeric values
 df['date'] = pd.to_datetime(df['eventDate'], unit='ms', errors='coerce')
@@ -45,7 +48,7 @@ invalid_lat_lon = df[(df['lat'].abs() > 90) | (df['lon'].abs() > 180) |
 df['lat'] = pd.to_numeric(df['lat'], errors='coerce')
 df['lon'] = pd.to_numeric(df['lon'], errors='coerce')
 
-# Drop null values
+# Drop null lat/lon values
 df = df.dropna(subset=['lat', 'lon'])
 
 # Summarise otter sighting data
@@ -56,23 +59,20 @@ sightings_per_day = total_sightings / unique_days if unique_days > 0 else 0
 total_days = (pd.Timestamp.today() - df['date'].min()).days
 sightings_per_total_days = total_sightings/total_days
 
+# Set up some columns and create some summary statistics
 col1, col2, col3, col4 = st.columns(4)
 col1.markdown(f"*Total Sightings:*  {total_sightings:,}")
 col2.markdown(f"*Unique Observation Days:* {unique_days}")
 col3.markdown(f"*Avg Sightings Per Observation Day:* {sightings_per_day:.2f}")
 col4.markdown(f"*Avg Sighting Per Total Days:* {sightings_per_total_days:.2f}")
 
-from datetime import datetime, timedelta
-
-# Increase/Decrease in sightings
-
-# Step 1: Filter sightings for the last 10 years
+# Step 1: Filter sightings for the last 10 years - filter last ten years from data frame
 today = datetime.today()
 ten_years_ago = today - timedelta(days=365 * 10)
 df['date'] = pd.to_datetime(df['date'])  # Ensure 'date' column is in datetime format
 df_recent = df[df['date'] >= ten_years_ago]
 
-# Step 2: Find top 3 lat/lon hotspots (using the filtered data)
+# Step 2: Find top 5 lat/lon hotspots (using the filtered data)
 top_coords = (
     df_recent.groupby(['lat', 'lon'])
     .size()
@@ -81,7 +81,7 @@ top_coords = (
     .head(5)  # Only top 5
 )
 
-# Step 3: Reverse geocode after selecting top 3
+# Step 3: Reverse geocode after selecting top 5 to get nearby area/town etc
 geolocator = Nominatim(user_agent="hotspot-locality-mapper")
 reverse = RateLimiter(geolocator.reverse, min_delay_seconds=1)
 
@@ -96,21 +96,11 @@ def get_locality(lat, lon):
     except:
         return "Unknown"
 
+# Apply reverse geocoding to get area/town etc
 top_coords['Locality'] = top_coords.apply(lambda row: get_locality(row['lat'], row['lon']), axis=1)
 
-# Step 4: Find bottom 3 lat/lon hotspots (using the filtered data)
-bottom_coords = (
-    df_recent.groupby(['lat', 'lon'])
-    .size()
-    .reset_index(name='Sightings')
-    .sort_values(by='Sightings', ascending=True)
-    .head(5)  # Only bottom 5
-)
 
-# Step 5: Reverse geocode after selecting bottom 3
-bottom_coords['Locality'] = bottom_coords.apply(lambda row: get_locality(row['lat'], row['lon']), axis=1)
-
-# Step 6: Show results by locality (top and bottom)
+# Step 6: Show results by locality 
 top_hotspots = (
     top_coords.groupby('Locality')['Sightings']
     .sum()
@@ -118,17 +108,7 @@ top_hotspots = (
     .sort_values(by='Sightings', ascending=False)
 )
 
-bottom_hotspots = (
-    bottom_coords.groupby('Locality')['Sightings']
-    .sum()
-    .reset_index()
-    .sort_values(by='Sightings', ascending=True)
-)
-
 col1, col2 = st.columns(2)
-
-import altair as alt
-
 textColor = "#333333"  # From your TOML
 
 with col1:
@@ -154,31 +134,26 @@ with col1:
     st.altair_chart(chart, use_container_width=True)
 
 
-
+# Add recommendations
 with col2:
     
     st.write("### Recommendations")
     st.markdown("""
     - **Improve Monitoring** *Greater attention in areas with few sightings to assess whether absence/low numbers is due to low populations or underreporting*.
     - **Temporal Peaks** *Seasonal changes in spring and autumn suggest seasonal patterns worth exploring and monitoring*.
-    - **Speak to Subject** *Matter Experts** Speaking to experts could help to improve data accuracy*.
+    - **Speak to Subject Matter Experts** *Speaking to experts could help to improve data accuracy*.
     - **Integrate Other Datasets** *The integration of other datasets would faciliate more accurate reporting and thus more conclusive insights*.
     - **Expanded Analysis** *Similar analysis of further species to identify broader biodiversity patterns*. 
     - **Causal Inference** *An exploration of reasons as to why these changes are taking place would help focus conservation efforts*. 
-
-
     """)
 
-
-# Recommendations
-
-
-
+# Add data information 
 col1, col2 = st.columns(2)
 with col1:
     st.write("**Data Information**")
     st.markdown('*Data has been cleaned to remove invalid lat/lon values as well as those records missing a date. Data collection has also been limited to 100,000 rows to faciliate app performance. The data is accessed through a live connection to the National Biodiversity Network API. The data is refreshed each time the app is refreshed.*')
-   
+
+# Add contact and project information
 with col2:
     st.write("**Contact and Project Information**")
     st.markdown("*For all contact enquiries please email: barnabyrumbold@hotmail.com*")
