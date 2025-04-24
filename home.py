@@ -16,11 +16,11 @@ from geopy.extra.rate_limiter import RateLimiter
 
 # Set up page layout with Mammal Society logo in the sidebar
 st.set_page_config(layout="wide")
-st.sidebar.markdown("""
-    <div style="text-align: center;">
-        <img src="https://images.squarespace-cdn.com/content/v1/654a3265fcbd755384b0552f/5cc2d0e2-dd55-449f-ae3a-949ab6871318/MSlogo_colour_strapblue_L-800px.jpeg?format=1500w" alt="Logo" width="100"/>
-    </div>
-""", unsafe_allow_html=True)
+# st.sidebar.markdown("""
+#     <div style="text-align: center;">
+#         <img src="https://images.squarespace-cdn.com/content/v1/654a3265fcbd755384b0552f/5cc2d0e2-dd55-449f-ae3a-949ab6871318/MSlogo_colour_strapblue_L-800px.jpeg?format=1500w" alt="Logo" width="100"/>
+#     </div>
+# """, unsafe_allow_html=True)
 
 
 # Title and further information
