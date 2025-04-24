@@ -8,10 +8,10 @@ import matplotlib.pyplot as plt
 
 # set page layout and add Mammal Society logo to sidebar
 st.set_page_config(layout="wide")
-st.sidebar.markdown("""<div style="text-align: center;">
-        <img src="https://images.squarespace-cdn.com/content/v1/654a3265fcbd755384b0552f/5cc2d0e2-dd55-449f-ae3a-949ab6871318/MSlogo_colour_strapblue_L-800px.jpeg?format=1500w" alt="Logo" width="100"/>
-    </div>
-""", unsafe_allow_html=True)
+# st.sidebar.markdown("""<div style="text-align: center;">
+#         <img src="https://images.squarespace-cdn.com/content/v1/654a3265fcbd755384b0552f/5cc2d0e2-dd55-449f-ae3a-949ab6871318/MSlogo_colour_strapblue_L-800px.jpeg?format=1500w" alt="Logo" width="100"/>
+#     </div>
+# """, unsafe_allow_html=True)
 
 # add page title
 st.write("### Seasonal Changes")
